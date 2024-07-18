@@ -1,0 +1,19 @@
+[submodule "SIBR_viewers"]
+	path = SIBR_viewers
+	url = https://gitlab.inria.fr/sibr/sibr_core.git
+	branch = gaussian_code_release_hierarchy
+[submodule "submodules/hierarchy-rasterizer"]
+	path = submodules/hierarchy-rasterizer
+	url = https://github.com/graphdeco-inria/hierarchy-rasterizer.git
+[submodule "submodules/simple-knn"]
+	path = submodules/simple-knn
+	url = https://gitlab.inria.fr/bkerbl/simple-knn.git
+[submodule "submodules/gaussianhierarchy"]
+	path = submodules/gaussianhierarchy
+	url = https://github.com/graphdeco-inria/gaussian-hierarchy.git
+[submodule "submodules/Depth-Anything-V2"]
+	path = submodules/Depth-Anything-V2
+	url = https://github.com/DepthAnything/Depth-Anything-V2.git
+[submodule "submodules/DPT"]
+	path = submodules/DPT
+	url = https://github.com/isl-org/DPT.git

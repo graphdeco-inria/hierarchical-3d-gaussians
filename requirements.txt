@@ -1,0 +1,13 @@
+plyfile
+tqdm
+joblib
+exif
+scikit-learn
+timm==0.4.5
+opencv-python==4.9.0.80
+gradio_imageslider
+gradio==4.29.0
+matplotlib
+submodules/hierarchy-rasterizer
+submodules/simple-knn
+submodules/gaussianhierarchy
