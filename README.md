@@ -35,7 +35,7 @@ git clone https://github.com/graphdeco-inria/hierarchical-3d-gaussians.git --rec
 
 We tested on Ubuntu 22.04 and Windows 11 using the following: 
 
-CMake (3.22.1), CUDA (11.8, 12.1 or 12.5), gcc/g++ 11.4.0 or Visual Studio 2019 and [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only).
+CMake (3.22.1), gcc/g++ 11.4.0 or Visual Studio 2019, CUDA (11.8, 12.1 or 12.5) and [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only).
 
 ### Python environment for optimization
 ```
@@ -52,7 +52,7 @@ To enable depth loss, download the model weights of one of these methods:
 ### Compiling hierarchy generator and merger
 ```
 cd submodules/gaussianhierarchy
-cmake . -B build
+cmake . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j --config Release
 cd ../..
 ```
@@ -65,7 +65,7 @@ Clone the hierarchy viewer and build:
 ```
 cd SIBR_viewers
 git clone https://github.com/graphdeco-inria/hierarchy-viewer.git src/projects/hierarchyviewer
-cmake -Bbuild . -DCMAKE_BUILD_TYPE=Release -DBUILD_IBR_HIERARCHYVIEWER=ON -DBUILD_IBR_ULR=OFF -DBUILD_IBR_DATASET_TOOLS=OFF -DBUILD_IBR_GAUSSIANVIEWER=OFF 
+cmake . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_IBR_HIERARCHYVIEWER=ON -DBUILD_IBR_ULR=OFF -DBUILD_IBR_DATASET_TOOLS=OFF -DBUILD_IBR_GAUSSIANVIEWER=OFF 
 cmake --build build -j --target install --config Release
 ```
 
@@ -77,13 +77,13 @@ Reconstruction has two main steps: 1) **[Preprocessing](#1-preprocessing)** the 
 
 #### Dataset 
 To get started, prepare a dataset or download and extract the [toy example](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/example_dataset.zip). 
-The dataset should have sorted images in a folder per camera in `${PROJECT_DIR}/inputs/images/` and optional masks (with `.png` extension) in `${PROJECT_DIR}/inputs/masks/`. Masks will be multiplied to the input images and renderings before computing loss. 
+The dataset should have sorted images in a folder per camera in `${DATASET_DIR}/inputs/images/` and optional masks (with `.png` extension) in `${DATASET_DIR}/inputs/masks/`. Masks will be multiplied to the input images and renderings before computing loss. 
 
 You can also work from our [full scenes](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/full_scenes). As we provide them calibrated and subdivided, you may skip to [Generate monocular depth maps](#13-generate-monocular-depth-maps).
 
-In the following, replace `${PROJECT_DIR}` with the path to your dataset. 
+In the following, replace `${DATASET_DIR}` with the path to your dataset. 
 
->*To skip the reconstruction and only display scenes, download pretrained hierarchies and scaffolds [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/results/), place them under `${PROJECT_DIR}/output/` and follow instructions [here](#3-real-time-viewer).* 
+>*To skip the reconstruction and only display scenes, download pretrained hierarchies and scaffolds [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/results/), place them under `${DATASET_DIR}/output/` and follow instructions [here](#3-real-time-viewer).* 
 
 ## 1. Preprocessing
 As in [3dgs](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) we need calibrated cameras and a point cloud to train our hierarchies on.
@@ -92,15 +92,15 @@ As in [3dgs](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) we need 
 
 The first step is to generate a "global colmap". The following command uses COLMAP's hierarchical mapper, rectify images and masks, and align and scale the sparse reconstruction to facilitate subdivision.
 ```
-python preprocess/generate_colmap.py --project_dir ${PROJECT_DIR}
+python preprocess/generate_colmap.py --project_dir ${DATASET_DIR}
 ```
 
 <details>
 <summary><span style="font-weight: bold;">Using calibrated images</span></summary>
 
-If your dataset already has COLMAP (with 2D and 3D SfM points) and rectified images, they should be placed under `${PROJECT_DIR}/camera_calibration/rectified`. As they still need alignment, run: 
+If your dataset already has COLMAP (with 2D and 3D SfM points) and rectified images, they should be placed under `${DATASET_DIR}/camera_calibration/rectified`. As they still need alignment, run: 
 ```
-python preprocess/auto_reorient.py --input_path ${PROJECT_DIR}/camera_calibration/rectified/sparse --output_path ${PROJECT_DIR}/camera_calibration/aligned/sparse/0
+python preprocess/auto_reorient.py --input_path ${DATASET_DIR}/camera_calibration/rectified/sparse --output_path ${DATASET_DIR}/camera_calibration/aligned/sparse/0
 ```
 
 </details>
@@ -112,7 +112,7 @@ python preprocess/auto_reorient.py --input_path ${PROJECT_DIR}/camera_calibratio
 Once the "global colmap" generated, it should be split into chunks. We also run a per-chunk bundle adjustment as COLMAP's hierarchical mapper is faster but less accurate (if your global colmap is accurate, you can skip this time consuming step with `--skip_bundle_adjustment`). 
 
 ```
-python preprocess/generate_chunks.py --project_dir ${PROJECT_DIR}
+python preprocess/generate_chunks.py --project_dir ${DATASET_DIR}
 ```
 *This step takes ~ 95 minutes on our example dataset using a RTX A6000, more details on each steps of the script [here](#generating-chunks).*
 > note that by using `--use_slurm` you can refine the chunks in parallel, remember to set your [slurm parameters](#slurm-parameters) in `preprocess/prepare_chunks.slurm` (gpu, account, etc ...).
@@ -120,7 +120,7 @@ python preprocess/generate_chunks.py --project_dir ${PROJECT_DIR}
 ### 1.3 Generate monocular depth maps
 In order to use depth regularization when training each chunks, depth maps must be generated for each rectified image. Then, depth scaling parameters needs to be computed as well, these two steps can be done using:
 ```
-python preprocess/generate_depth.py --project_dir ${PROJECT_DIR}
+python preprocess/generate_depth.py --project_dir ${DATASET_DIR}
 ```
 ### Project structure
 Now you should have the following file structure, it is required for the training part: 
@@ -160,7 +160,7 @@ Make sure that you correctly [set up your environment](#setup) and [built the hi
 
 The `full_train.py` script performs all these steps to train a hierarchy from a preprocessed scene. While training, the progress can be visualized with the remote viewer ([build instructions](#compiling-the-real-time-viewer)).
 ```
-python scripts/full_train.py --project_dir ${PROJECT_DIR}
+python scripts/full_train.py --project_dir ${DATASET_DIR}
 ```
 <details>
 <summary><span style="font-weight: bold;">Command Line Arguments</span></summary>
@@ -207,7 +207,7 @@ The hierarchical real-time viewer is used to vizualize our trained hierarchies. 
 
 After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>`. 
 ```
-SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${PROJECT_DIR}/camera_calibration/aligned --scaffold ${PROJECT_DIR}/output/scaffold/point_cloud/iteration_30000 --model-path ${PROJECT_DIR}/output/merged.hier --images-path ${PROJECT_DIR}/camera_calibration/rectified/images
+SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${DATASET_DIR}/camera_calibration/aligned --scaffold ${DATASET_DIR}/output/scaffold/point_cloud/iteration_30000 --model-path ${DATASET_DIR}/output/merged.hier --images-path ${DATASET_DIR}/camera_calibration/rectified/images
 ```
 <details>
 <summary><span style="font-weight: bold;">Command Line Arguments for Real-Time Viewer</span></summary>
@@ -290,7 +290,7 @@ SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${PROJECT_DIR}/
 
 - The previously created `matching.txt` file will be used with the feature matching:
     ```
-    cd ${PROJECT_DIR}/unrectified
+    cd ${DATASET_DIR}/unrectified
     colmap matches_importer --database_path <database.db> --match_list_path <matching.txt file path>
     ``` 
     [**Command Line Arguments**](https://colmap.github.io/cli)
@@ -305,7 +305,7 @@ SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${PROJECT_DIR}/
 - Remove floating cameras and feature points that don't have sfm points, to make the colmap lighter:
     ```
     cd hierarchical_3d_gaussians
-    python preprocess/simplify_images.py --base_dir ${PROJECT_DIR}/unrectified/sparse/0
+    python preprocess/simplify_images.py --base_dir ${DATASET_DIR}/unrectified/sparse/0
     ```
     <details>
     <summary><span style="font-weight: bold;">Command Line Arguments</span></summary>
@@ -324,7 +324,7 @@ SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${PROJECT_DIR}/
 
 - Undistort calibrated cameras, resulting images will be used during training:
     ```
-    cd ${PROJECT_DIR}
+    cd ${DATASET_DIR}
     colmap image_undistorter --image_path <path to images> --input_path <unrectified/sparse/0> --output_path <rectified> --output_type COLMAP --max_image_size 2048
     ```
     *If alpha masks are used, they should be undistorted the same way as images. Please find instructions on how to do it in the `generate_colmap.py` script.*
@@ -531,12 +531,12 @@ python render_hierarchy.py -s ${CHUNK_DIR} --model_path ${OUTPUT_DIR} --hierarch
 Ensure that the test.txt is present in all `sparse/0/` folders. `preprocess/copy_file_to_chunks.py` can help copying it to each chunk.
 Then, the scene can be optimized with `eval`:
 ```
-python scripts/full_train.py --project_dir ${PROJECT_DIR} --extra_training_args '--exposure_lr_init 0.0 --eval'
+python scripts/full_train.py --project_dir ${DATASET_DIR} --extra_training_args '--exposure_lr_init 0.0 --eval'
 ```
 
 The following renders the test set from the optimized hierarchy. Note that the current implementation loads the full hierarchy in GPU memory.
 ```
-python render_hierarchy.py -s ${PROJECT_DIR} --model_path ${PROJECT_DIR}/output --hierarchy ${PROJECT_DIR}/output/merged.hier --out_dir ${PROJECT_DIR}/output/renders --eval --scaffold_file ${PROJECT_DIR}/output/scaffold/point_cloud/iteration_30000
+python render_hierarchy.py -s ${DATASET_DIR} --model_path ${DATASET_DIR}/output --hierarchy ${DATASET_DIR}/output/merged.hier --out_dir ${DATASET_DIR}/output/renders --eval --scaffold_file ${DATASET_DIR}/output/scaffold/point_cloud/iteration_30000
 ```
 
 ### Exposure optimization
