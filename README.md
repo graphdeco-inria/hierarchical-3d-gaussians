@@ -25,6 +25,14 @@ Bibliography:
 }
 ```
 
+## Roadmap
+Please note that the code release is currently in alpha. We intend to provide fixes for issues that are experienced by users, due to difficulties with setups and/or environments that we did not test on. The below steps were successfully tested on Windows and Ubuntu 22. We appreciate the documentation of issues by users and will try to address them. Furthermore, there are several points that we will integrate in the coming weeks:
+- Datasets: We will add links for large-scale datasets that are currently undergoing auditing.
+- Windows binaries: Once we have sufficiently tested them, we will add pre-compiled binaries for the viewers on Windows.
+- Direct conversion of legacy 3DGS models: we are testing the conversion of scenes trained with vanilla 3DGS to hierarchical models. Once the quality is assured and we have concluded testing, we will document the necessary steps to do so.
+- Streaming from disk: currently, data is streamed on-demand to the GPU, however, the viewed dataset must fit into memory. This can become prohibitive in the hierarchy merger and real-time viewer. We will adapt the code to allow dynamic streaming from disk soon.
+- Reduce real-time viewer memory usage: the storage configuration for the real-time viewer is unoptimized. Users can define a VRAM budget for the scene, but it is not used as efficiently as it could be. We will iterate towards making sure that higher quality settings can be achieved with lower budgets.
+
 ## Setup
 
 Make sure to clone the repo using `--recursive`:
@@ -158,7 +166,7 @@ project
 
 Make sure that you correctly [set up your environment](#setup) and [built the hierarchy merger/creator](#building-chunk-hierarchies)
 
-The `full_train.py` script performs all these steps to train a hierarchy from a preprocessed scene. While training, the progress can be visualized with the remote viewer ([build instructions](#compiling-the-real-time-viewer)).
+The `full_train.py` script performs all these steps to train a hierarchy from a preprocessed scene. While training, the progress can be visualized with the original 3DGS remote viewer ([build instructions](#compiling-the-real-time-viewer)).
 ```
 python scripts/full_train.py --project_dir ${DATASET_DIR}
 ```
@@ -205,7 +213,7 @@ The hierarchical real-time viewer is used to vizualize our trained hierarchies. 
 
 ![alt text](assets/hierarchy_viewer_0.gif "hierarchy viewer")
 
-After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>`. 
+After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>` (by default set to 16000, assuming at least 16 GB of VRAM). Note that this only defines the budget for the SCENE representation. Rendering will require some additional VRAM (up to 1.5 GB) for framebuffer structs. Note that the real-time renderer assumes that CUDA/OpenGL Interop is available on your system (see the original 3DGS documentation for more details). 
 ```
 SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${DATASET_DIR}/camera_calibration/aligned --scaffold ${DATASET_DIR}/output/scaffold/point_cloud/iteration_30000 --model-path ${DATASET_DIR}/output/merged.hier --images-path ${DATASET_DIR}/camera_calibration/rectified/images
 ```
@@ -224,8 +232,8 @@ SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${DATASET_DIR}/
   Path to rectified input images to be viewed in the top view.
   #### --device
   Index of CUDA device to use for rasterization if multiple are available, ```0``` by default.
-  #### --no_interop
-  Disables CUDA/GL interop forcibly. Use on systems that may not behave according to spec (e.g., WSL2 with MESA GL 4.5 software rendering).
+  #### --budget
+  Amount of VRAM memory that may be used for the hierarchical 3DGS scene representation.
 </details>
 <br>
 
