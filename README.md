@@ -31,7 +31,7 @@ Please note that the code release is currently in alpha. We intend to provide fi
 - Windows binaries: Once we have sufficiently tested them, we will add pre-compiled binaries for the viewers on Windows.
 - Direct conversion of legacy 3DGS models: we are testing the conversion of scenes trained with vanilla 3DGS to hierarchical models. Once the quality is assured and we have concluded testing, we will document the necessary steps to do so.
 - Streaming from disk: currently, data is streamed on-demand to the GPU, however, the viewed dataset must fit into memory. This can become prohibitive in the hierarchy merger and real-time viewer. We will adapt the code to allow dynamic streaming from disk soon.
-- Reduce real-time viewer memory usage: the storage configuration for the real-time viewer is unoptimized. Users can define a VRAM budget for the scene, but it is not used as efficiently as it could be. We will iterate towards making sure that higher quality settings can be achieved with lower budgets.
+- Reduce real-time viewer resource usage: the storage configuration for the real-time viewer is unoptimized, and so is the speed. Users can define a VRAM budget for the scene, but it is not used as efficiently as it could be. We will iterate towards making sure that higher quality settings can be achieved with lower budgets and better framerates. We will try to make the budget so that it effectively limits the TOTAL application VRAM, including framebuffer structs.
 
 ## Setup
 
