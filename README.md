@@ -473,7 +473,7 @@ Make sure to have the [depth estimator weights](#optional-weights-for-monocular-
 2. #### Generate `depth_params.json` file from the depth maps created on step *1.* 
       *this file will be used for the depth regularization for single chunk training. It needs to be generated for each chunk.* 
       ```bash
-      cd hierarchical_gaussians
+      cd ../../
       python preprocess/make_depth_scale.py --base_dir [path to colmap] --depths_dir [path to output depth dir]
       ```
 
