@@ -179,7 +179,7 @@ project
 
 *The scene training process is divided into five steps; 1) we first train a global, coarse 3D Gaussian splatting scene ("the scaffold"), then 2) train each chunk independently in parallel, 3) build the hierarchy, 4) optimize the hierarchy in each chunk and finally 5) consolidate the chunks to create the final hierarchy*.
 
-Make sure that you correctly [set up your environment](#setup) and [built the hierarchy merger/creator](#building-chunk-hierarchies)
+Make sure that you correctly [set up your environment](#setup) and [built the hierarchy merger/creator](#compiling-hierarchy-generator-and-merger)
 
 The `full_train.py` script performs all these steps to train a hierarchy from a preprocessed scene. While training, the progress can be visualized with the original 3DGS remote viewer ([build instructions](#compiling-the-real-time-viewer)).
 ```
@@ -460,7 +460,7 @@ The last preprocessing step is to divide the colmap into chunks, each chunk will
 
 
 ## Monocular depth maps
-Make sure to have the [depth estimator weights](#optional-weights-for-monocular-depth-estimation).
+Make sure to have the [depth estimator weights](#weights-for-monocular-depth-estimation).
 1. #### Generate depth maps (should run for each subfolder in `images/`)
     * Using Depth Anything V2 (prefered):
         ```
@@ -482,7 +482,7 @@ Make sure to have the [depth estimator weights](#optional-weights-for-monocular-
 
 ## Training steps
 
-Make sure that you correctly [set up repositories and environments](#setting-up-each-steps)
+Make sure that you correctly [set up repositories and environments](#setup)
 
 - **Coarse optimization**<br>
    To allow consistent training of all chunks, we create a basic scaffold and skybox for all ensuing steps:
@@ -491,13 +491,13 @@ Make sure that you correctly [set up repositories and environments](#setting-up-
     ```
     
 - **Single chunk training**<br>
-It is recommended to train using depth regularization to have better results, especially if your scene contains textureless surfaces such as roads. Make sure you [generated depth maps](#optional-monocular-depth-maps)
+It is recommended to train using depth regularization to have better results, especially if your scene contains textureless surfaces such as roads. Make sure you [generated depth maps](#monocular-depth-maps)
     ```
     python -u train_single.py -s [project/chunks/chunk_name] --model_path [output/chunks/chunk_name] -i [project/rectified/images] -d [project/rectified/depths] --alpha_masks [project/rectified/masks] --scaffold_file [output/scaffold/point_cloud/iteration_30000] --skybox_locked --bounds_file [project/chunks/chunk_name]    
     ```
 
 - **Per chunk hierarchy building**<br>
-*Make sure you followed the [steps to generate the hierarchy creator executable file](#building-chunk-hierarchies)*.
+*Make sure you followed the [steps to generate the hierarchy creator executable file](#compiling-hierarchy-generator-and-merger)*.
 Now we will generate a hierarchy in each chunk:
     ```
     # Linux: 
@@ -513,7 +513,7 @@ Now we will generate a hierarchy in each chunk:
     ```
 
 - **Consolidation**
-*Make sure you followed the [steps to generate the hierarchy merger executable file](#building-chunk-hierarchies)*.
+*Make sure you followed the [steps to generate the hierarchy merger executable file](#compiling-hierarchy-generator-and-merger)*.
 Now we will consolidate and merge all the chunk hierarchies:
     ```
     # Linux:
@@ -542,7 +542,10 @@ Note that the slurm scripts have not been thouroughly tested.
 We use a test.txt file that is read by the dataloader and splits into train/test sets when `--eval` is passed to the training scripts. This file should be present in `sprase/0/` for each chunk and for the aligned "global colmap" (if applicable).
 
 ### Single chunk
-The single chunks we used for evaluation are available [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/standalone_chunks/small_city.zip). To run the evaluations on a chunk:
+The single chunks we used for evaluation: 
+* [SmallCity](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/standalone_chunks/small_city.zip) 
+
+To run the evaluations on a chunk:
 ```
 python train_single.py -s ${CHUNK_DIR} --model_path ${OUTPUT_DIR} -d depths --exposure_lr_init 0.0 --eval --skip_scale_big_gauss
 
