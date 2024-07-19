@@ -47,7 +47,7 @@ We tested on Ubuntu 22.04 and Windows 11 using the following:
 * CMake 3.22.1
 * gcc/g++ 11.4.0 or Visual Studio 2019
 * CUDA (11.8, 12.1 or 12.5)
-* [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only). Linux: [build from source](https://colmap.github.io/install.html). Windows: add the path to the COLMAP.bat directory.
+* [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only). Linux: [build from source](https://colmap.github.io/install.html). Windows: add the path to the COLMAP.bat directory to the PATH environment variable.
 
 ### Python environment for optimization
 ```
