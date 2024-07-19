@@ -2,7 +2,7 @@
 
 [Bernhard Kerbl](https://scholar.google.at/citations?user=jeasMB0AAAAJ&hl=en)\*, [Andreas Meuleman](https://ameuleman.github.io/)\*, [Georgios Kopanas](https://grgkopanas.github.io/), [Michael Wimmer](https://scholar.google.at/citations?user=DIwQC78AAAAJ&hl=en), [Alexandre Lanvin](https://scholar.google.com/citations?hl=fr&user=e1s7mGsAAAAJ), [George Drettakis](http://www-sop.inria.fr/members/George.Drettakis/) (* indicates equal contribution)
 
-### [Project page](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/) | [Paper](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/hierarchical-3d-gaussians_low.pdf) | [Data](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/)
+### [Project page](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/) | [Paper](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/hierarchical-3d-gaussians_low.pdf) 
 
 This repository contains the official authors' implementation associated with the paper "A Hierarchical 3D Gaussian Representation for Real-Time Rendering of Very Large Datasets". We explain the different steps required to run our algorithm. We use a ["toy example"](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/example_dataset.zip) of 1500 images organized in 2 chunks to illustrate each step of the method and facilitate reproduction. The full datasets presented in the paper will be released as soon as the data protection process is completed (please stay tuned).
 
@@ -92,7 +92,9 @@ Reconstruction has two main steps: 1) **[Preprocessing](#1-preprocessing)** the 
 To get started, prepare a dataset or download and extract the [toy example](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/example_dataset.zip). 
 The dataset should have sorted images in a folder per camera in `${DATASET_DIR}/inputs/images/` and optional masks (with `.png` extension) in `${DATASET_DIR}/inputs/masks/`. Masks will be multiplied to the input images and renderings before computing loss. 
 
-You can also work from our [full scenes](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/full_scenes). As we provide them calibrated and subdivided, you may skip to [Generate monocular depth maps](#13-generate-monocular-depth-maps).
+You can also work from our full scenes. As we provide them calibrated and subdivided, you may skip to [Generate monocular depth maps](#13-generate-monocular-depth-maps). The datasets:
+* [SmallCity](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/full_scenes/small_city.zip)
+
 
 In the following, replace `${DATASET_DIR}` with the path to your dataset or set DATASET_DIR:
 ```
@@ -103,7 +105,8 @@ DATASET_DIR=<Path to your dataset>
 ${DATASET_DIR} = "<Path to your dataset>"
 ```
 
->*To skip the reconstruction and only display scenes, download pretrained hierarchies and scaffolds [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/results/), place them under `${DATASET_DIR}/output/` and follow instructions [here](#3-real-time-viewer).* 
+>*To skip the reconstruction and only display scenes, download pretrained hierarchies and scaffolds, place them under `${DATASET_DIR}/output/` and follow the [viewer instructions](#3-real-time-viewer). The pretrained hierarchies:* 
+>* [*SmallCity*](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/results/small_city.zip) 
 
 ## 1. Preprocessing
 As in [3dgs](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) we need calibrated cameras and a point cloud to train our hierarchies on.
@@ -539,7 +542,7 @@ Note that the slurm scripts have not been thouroughly tested.
 We use a test.txt file that is read by the dataloader and splits into train/test sets when `--eval` is passed to the training scripts. This file should be present in `sprase/0/` for each chunk and for the aligned "global colmap" (if applicable).
 
 ### Single chunk
-The single chunks we used for evaluation are available [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/standalone_chunks). To run the evaluations on a chunk:
+The single chunks we used for evaluation are available [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/standalone_chunks/small_city.zip). To run the evaluations on a chunk:
 ```
 python train_single.py -s ${CHUNK_DIR} --model_path ${OUTPUT_DIR} -d depths --exposure_lr_init 0.0 --eval --skip_scale_big_gauss
 
