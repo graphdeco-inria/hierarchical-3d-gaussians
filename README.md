@@ -38,18 +38,23 @@ Please note that the code release is currently in alpha. We intend to provide fi
 Make sure to clone the repo using `--recursive`:
 ```
 git clone https://github.com/graphdeco-inria/hierarchical-3d-gaussians.git --recursive
+cd hierarchical-3d-gaussians
 ```
 ### Prerequisite
 
 We tested on Ubuntu 22.04 and Windows 11 using the following: 
 
-CMake (3.22.1), gcc/g++ 11.4.0 or Visual Studio 2019, CUDA (11.8, 12.1 or 12.5) and [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only).
+* CMake 3.22.1
+* gcc/g++ 11.4.0 or Visual Studio 2019
+* CUDA (11.8, 12.1 or 12.5)
+* [COLMAP 3.9.1](https://github.com/colmap/colmap/releases/tag/3.9.1) (for preprocessing only). Linux: [build from source](https://colmap.github.io/install.html). Windows: add the path to the COLMAP.bat directory.
 
 ### Python environment for optimization
 ```
 conda create -n hierarchical_3d_gaussians python=3.12 -y
 conda activate hierarchical_3d_gaussians
-pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu121 # Replace with cu118 if using CUDA 11.x 
+# Replace cu121 with cu118 if using CUDA 11.x 
+pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu121 
 pip install -r requirements.txt
 ```
 ### Weights for monocular depth estimation 
@@ -89,7 +94,14 @@ The dataset should have sorted images in a folder per camera in `${DATASET_DIR}/
 
 You can also work from our [full scenes](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/full_scenes). As we provide them calibrated and subdivided, you may skip to [Generate monocular depth maps](#13-generate-monocular-depth-maps).
 
-In the following, replace `${DATASET_DIR}` with the path to your dataset. 
+In the following, replace `${DATASET_DIR}` with the path to your dataset or set DATASET_DIR:
+```
+# Bash:
+DATASET_DIR=<Path to your dataset>
+
+# PowerShell:
+${DATASET_DIR} = "<Path to your dataset>"
+```
 
 >*To skip the reconstruction and only display scenes, download pretrained hierarchies and scaffolds [here](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/datasets/results/), place them under `${DATASET_DIR}/output/` and follow instructions [here](#3-real-time-viewer).* 
 
@@ -213,7 +225,7 @@ The hierarchical real-time viewer is used to vizualize our trained hierarchies. 
 
 ![alt text](assets/hierarchy_viewer_0.gif "hierarchy viewer")
 
-After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. 
+After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. Controls are described [here](https://github.com/graphdeco-inria/gaussian-splatting?tab=readme-ov-file#navigation-in-sibr-viewers).
 
 If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>` (by default set to 16000, assuming at least 16 GB of VRAM). Note that this only defines the budget for the SCENE representation. Rendering will require some additional VRAM (up to 1.5 GB) for framebuffer structs. Note that the real-time renderer assumes that CUDA/OpenGL Interop is available on your system (see the original 3DGS documentation for more details). 
 
