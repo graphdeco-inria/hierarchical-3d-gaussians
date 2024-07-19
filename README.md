@@ -213,7 +213,11 @@ The hierarchical real-time viewer is used to vizualize our trained hierarchies. 
 
 ![alt text](assets/hierarchy_viewer_0.gif "hierarchy viewer")
 
-After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>` (by default set to 16000, assuming at least 16 GB of VRAM). Note that this only defines the budget for the SCENE representation. Rendering will require some additional VRAM (up to 1.5 GB) for framebuffer structs. Note that the real-time renderer assumes that CUDA/OpenGL Interop is available on your system (see the original 3DGS documentation for more details). 
+After [installing the viewers](#compiling-the-real-time-viewer), you may run the compiled SIBR_gaussianHierarchyViewer_app in `<SIBR install dir>/bin/`. 
+
+If not a lot of VRAM is available, add `--budget <Budget for the parameters in MB>` (by default set to 16000, assuming at least 16 GB of VRAM). Note that this only defines the budget for the SCENE representation. Rendering will require some additional VRAM (up to 1.5 GB) for framebuffer structs. Note that the real-time renderer assumes that CUDA/OpenGL Interop is available on your system (see the original 3DGS documentation for more details). 
+
+The interface includes a field for ```tau (size limit)``` which defines the desired granularity setting. Note that ```tau = 0``` will try to render the complete dataset (all leaf nodes). If the granularity setting exceeds the available VRAM budget, instead of running out of memory, the viewer will auto-regulate and raise the granularity until the scene can fit inside the defined VRAM budget.
 ```
 SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${DATASET_DIR}/camera_calibration/aligned --scaffold ${DATASET_DIR}/output/scaffold/point_cloud/iteration_30000 --model-path ${DATASET_DIR}/output/merged.hier --images-path ${DATASET_DIR}/camera_calibration/rectified/images
 ```
