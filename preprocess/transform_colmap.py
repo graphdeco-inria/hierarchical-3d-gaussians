@@ -1,3 +1,14 @@
+#
+# Copyright (C) 2024, Inria
+# GRAPHDECO research group, https://team.inria.fr/graphdeco
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use 
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  george.drettakis@inria.fr
+#
+
 import numpy as np
 import argparse
 import os
@@ -11,6 +22,9 @@ Transform = collections.namedtuple(
 )
 
 def procrustes_analysis(X0,X1): # [N,3]
+    """
+    From https://github.com/chenhsuanlin/bundle-adjusting-NeRF/blob/803291bd0ee91c7c13fb5cc42195383c5ade7d15/camera.py#L278
+    """
     # translation
     t0 = X0.mean(dim=0,keepdim=True)
     t1 = X1.mean(dim=0,keepdim=True)

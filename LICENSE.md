@@ -1,7 +1,7 @@
-Gaussian-Splatting License  
+Hierarchical-3d-Gaussians License  
 ===========================  
 
-**Inria** and **the Max Planck Institut for Informatik (MPII)** hold all the ownership rights on the *Software* named **gaussian-splatting**.  
+**Inria** and **the Max Planck Institut for Informatik (MPII)** hold all the ownership rights on the *Software* named **hierarchical-3d-gaussians**.  
 The *Software* is in the process of being registered with the Agence pour la Protection des  
 Programmes (APP).  
 
@@ -18,7 +18,7 @@ its *Work*.
 *Licensor* means the owners of the *Software*, i.e Inria and MPII  
 
 *Software* means the original work of authorship made available under this  
-License ie gaussian-splatting.  
+License ie hierarchical-3d-gaussians.  
 
 *Work* means the *Software* and any additions to or derivative works of the  
 *Software* that are made available under this License.  

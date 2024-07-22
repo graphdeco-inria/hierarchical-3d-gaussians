@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023, Inria
+# Copyright (C) 2023 - 2024, Inria
 # GRAPHDECO research group, https://team.inria.fr/graphdeco
 # All rights reserved.
 #
