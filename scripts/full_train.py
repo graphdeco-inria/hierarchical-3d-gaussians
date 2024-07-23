@@ -102,7 +102,11 @@ if __name__ == '__main__':
                 "-i", images_dir,
                 "--skybox_num", "100000",
                 "--model_path", os.path.join(output_dir, "scaffold")
-            ]) + " --alpha_masks " + masks_dir + " " + args.extra_training_args
+            ])
+            if masks_dir != "":
+                train_coarse_args += " --alpha_masks " + masks_dir
+            if args.extra_training_args != "": 
+                train_coarse_args += " " + args.extra_training_args
 
             try:
                 subprocess.run(train_coarse_args, shell=True, check=True)
@@ -125,7 +129,11 @@ if __name__ == '__main__':
         f"-i {images_dir}", f"-d {depths_dir}",
         f"--scaffold_file {output_dir}/scaffold/point_cloud/iteration_30000",
         "--skybox_locked" 
-    ]) + " --alpha_masks " + masks_dir + " " + args.extra_training_args
+    ])
+    if masks_dir != "":
+        train_chunk_args += " --alpha_masks " + masks_dir
+    if args.extra_training_args != "": 
+        train_chunk_args += " " + args.extra_training_args
 
     hierarchy_creator_args = "submodules/gaussianhierarchy/build/Release/GaussianHierarchyCreator.exe " if os_name == "Windows" else "submodules/gaussianhierarchy/build/GaussianHierarchyCreator "
     hierarchy_creator_args = os.path.join(f_path.parent.parent, hierarchy_creator_args)
@@ -135,7 +143,11 @@ if __name__ == '__main__':
         "--iterations 15000", "--feature_lr 0.0005",
         "--opacity_lr 0.01", "--scaling_lr 0.001", "--save_iterations -1",
         f"-i {images_dir}",  f"--scaffold_file {output_dir}/scaffold/point_cloud/iteration_30000",
-    ]) + " --alpha_masks " + masks_dir + " " + args.extra_training_args
+    ])
+    if masks_dir != "":
+        post_opt_chunk_args += " --alpha_masks " + masks_dir
+    if args.extra_training_args != "": 
+        post_opt_chunk_args += " " + args.extra_training_args
 
     
     chunk_names = os.listdir(chunks_dir)
