@@ -55,6 +55,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--output_dir', default="")
     parser.add_argument('--use_slurm', action="store_true", default=False)
+    parser.add_argument('--skip_if_exists', action="store_true", default=False, help="Skip training a chunk if it already has a hierarchy")
     args = parser.parse_args()
     print(args.extra_training_args)
 
@@ -75,36 +76,39 @@ if __name__ == '__main__':
         os.makedirs(os.path.join(output_dir, "trained_chunks"))
   
     ## First step is coarse optimization to generate a scaffold that will be used later.
-    if args.use_slurm:
-        if args.args.extra_training_args != "":
-            print("\nThe script does not support passing extra_training_args to slurm!!\n")
-        submitted_jobs_ids = []
-        slurm_args = [
-            "sbatch", 
-        ]
-
-        coarse_train = submit_job(slurm_args + [
-            f"--error={output_dir}/scaffold/log.err", f"--output={output_dir}/scaffold/log.out",
-            "coarse_train.slurm", args.env_name, colmap_dir, images_dir, output_dir, " --alpha_masks " + masks_dir
-        ])
-        print("waiting for coarse training to finish...")
-        while is_job_finished(coarse_train) == "":
-            time.sleep(10)
+    if args.skip_if_exists and os.path.exists(os.path.join(output_dir, "scaffold/point_cloud/iteration_30000/point_cloud.ply")):
+        print("Skipping coarse")
     else:
-        train_coarse_args =  " ".join([
-            "python", "train_coarse.py",
-            "-s", colmap_dir,
-            "--save_iterations", "-1",
-            "-i", images_dir,
-            "--skybox_num", "100000",
-            "--model_path", os.path.join(output_dir, "scaffold")
-        ]) + " --alpha_masks " + masks_dir + " " + args.extra_training_args
+        if args.use_slurm:
+            if args.args.extra_training_args != "":
+                print("\nThe script does not support passing extra_training_args to slurm!!\n")
+            submitted_jobs_ids = []
+            slurm_args = [
+                "sbatch", 
+            ]
 
-        try:
-            subprocess.run(train_coarse_args, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing train_coarse: {e}")
-            sys.exit(1)
+            coarse_train = submit_job(slurm_args + [
+                f"--error={output_dir}/scaffold/log.err", f"--output={output_dir}/scaffold/log.out",
+                "coarse_train.slurm", args.env_name, colmap_dir, images_dir, output_dir, " --alpha_masks " + masks_dir
+            ])
+            print("waiting for coarse training to finish...")
+            while is_job_finished(coarse_train) == "":
+                time.sleep(10)
+        else:
+            train_coarse_args =  " ".join([
+                "python", "train_coarse.py",
+                "-s", colmap_dir,
+                "--save_iterations", "-1",
+                "-i", images_dir,
+                "--skybox_num", "100000",
+                "--model_path", os.path.join(output_dir, "scaffold")
+            ]) + " --alpha_masks " + masks_dir + " " + args.extra_training_args
+
+            try:
+                subprocess.run(train_coarse_args, shell=True, check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Error executing train_coarse: {e}")
+                sys.exit(1)
 
 
     if not os.path.isabs(images_dir):
@@ -139,57 +143,60 @@ if __name__ == '__main__':
         source_chunk = os.path.join(chunks_dir, chunk_name)
         trained_chunk = os.path.join(output_dir, "trained_chunks", chunk_name)
 
-        ## Training can be done in parallel using slurm.
-        if args.use_slurm:
-            job_id = submit_job(slurm_args + [
-                f"--error={trained_chunk}/log.err", f"--output={trained_chunk}/log.out",
-                "train_chunk.slurm", source_chunk, output_dir, args.env_name, 
-                chunk_name, hierarchy_creator_args, images_dir,
-                depths_dir, " --alpha_masks " + masks_dir
-            ])
-
-            submitted_jobs_ids.append(job_id)
+        if args.skip_if_exists and os.path.exists(os.path.join(trained_chunk, "hierarchy.hier_opt")):
+            print(f"Skipping {chunk_name}")
         else:
-            print(f"Training chunk {chunk_name}")
+            ## Training can be done in parallel using slurm.
+            if args.use_slurm:
+                job_id = submit_job(slurm_args + [
+                    f"--error={trained_chunk}/log.err", f"--output={trained_chunk}/log.out",
+                    "train_chunk.slurm", source_chunk, output_dir, args.env_name, 
+                    chunk_name, hierarchy_creator_args, images_dir,
+                    depths_dir, " --alpha_masks " + masks_dir
+                ])
+
+                submitted_jobs_ids.append(job_id)
+            else:
+                print(f"Training chunk {chunk_name}")
+                try:
+                    subprocess.run(
+                        train_chunk_args + " -s "+ source_chunk + 
+                        " --model_path " + trained_chunk +
+                        " --bounds_file "+ source_chunk,
+                        shell=True, check=True
+                    )
+                except subprocess.CalledProcessError as e:
+                    print(f"Error executing train_single: {e}")
+                    sys.exit(1)
+
+                # Generate a hierarchy within each chunks
+            print(f"Generating hierarchy for chunk {chunk_name}")
             try:
                 subprocess.run(
-                    train_chunk_args + " -s "+ source_chunk + 
+                hierarchy_creator_args + " ".join([
+                        os.path.join(trained_chunk, "point_cloud/iteration_30000/point_cloud.ply"),
+                        source_chunk,
+                        trained_chunk,
+                        os.path.join(output_dir, "scaffold/point_cloud/iteration_30000")
+                    ]),
+                    shell=True, check=True, text=True
+                )
+            except subprocess.CalledProcessError as e:
+                print(f"Error executing hierarchy_creator: {e}")
+                sys.exit(1)
+
+            # Post optimization on each chunks
+            print(f"post optimizing chunk {chunk_name}")
+            try:
+                subprocess.run(
+                    post_opt_chunk_args + " -s "+ source_chunk + 
                     " --model_path " + trained_chunk +
-                    " --bounds_file "+ source_chunk,
+                    " --hierarchy " + os.path.join(trained_chunk, "hierarchy.hier"),
                     shell=True, check=True
                 )
             except subprocess.CalledProcessError as e:
-                print(f"Error executing train_single: {e}")
+                print(f"Error executing train_coarse: {e}")
                 sys.exit(1)
-
-            # Generate a hierarchy within each chunks
-        print(f"Generating hierarchy for chunk {chunk_name}")
-        try:
-            subprocess.run(
-            hierarchy_creator_args + " ".join([
-                    os.path.join(trained_chunk, "point_cloud/iteration_30000/point_cloud.ply"),
-                    source_chunk,
-                    trained_chunk,
-                    os.path.join(output_dir, "scaffold/point_cloud/iteration_30000")
-                ]),
-                shell=True, check=True, text=True
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing hierarchy_creator: {e}")
-            sys.exit(1)
-
-        # Post optimization on each chunks
-        print(f"post optimizing chunk {chunk_name}")
-        try:
-            subprocess.run(
-                post_opt_chunk_args + " -s "+ source_chunk + 
-                " --model_path " + trained_chunk +
-                " --hierarchy " + os.path.join(trained_chunk, "hierarchy.hier"),
-                shell=True, check=True
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing train_coarse: {e}")
-            sys.exit(1)
 
     if args.use_slurm:
         # Check every 10 sec all the jobs status

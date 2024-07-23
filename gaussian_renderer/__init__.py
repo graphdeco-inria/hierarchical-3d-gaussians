@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023, Inria
+# Copyright (C) 2023 - 2024, Inria
 # GRAPHDECO research group, https://team.inria.fr/graphdeco
 # All rights reserved.
 #
@@ -328,7 +328,7 @@ def render_coarse(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.T
         sh_degree=pc.active_sh_degree,
         campos=viewpoint_camera.camera_center,
         prefiltered=False,
-        debug=pipe.debug,
+        debug=True,
         do_depth=False,
         render_indices=render_indices,
         parent_indices=parent_indices,
