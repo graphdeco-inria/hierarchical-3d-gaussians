@@ -447,7 +447,7 @@ def write_points3D_text(points3D, path):
     with open(path, "w") as fid:
         fid.write(HEADER)
         for _, pt in points3D.items():
-            point_header = [pt.id, *pt.xyz, *pt.rgb, pt.error]
+            point_header = [pt.id, *pt.xyz.numpy(), *pt.rgb, pt.error]
             fid.write(" ".join(map(str, point_header)) + " ")
             track_strings = []
             for image_id, point2D in zip(pt.image_ids, pt.point2D_idxs):
