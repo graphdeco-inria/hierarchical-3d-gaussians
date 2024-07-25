@@ -56,6 +56,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_dir', default="")
     parser.add_argument('--use_slurm', action="store_true", default=False)
     parser.add_argument('--skip_if_exists', action="store_true", default=False, help="Skip training a chunk if it already has a hierarchy")
+    parser.add_argument('--keep_running', action="store_true", default=False, help="Keep running even if a chunk processing fails")
     args = parser.parse_args()
     print(args.extra_training_args)
 
@@ -119,7 +120,7 @@ if __name__ == '__main__':
         images_dir = os.path.join("../", images_dir)
     if not os.path.isabs(depths_dir):
         depths_dir = os.path.join("../", depths_dir)
-    if not os.path.isabs(masks_dir):
+    if masks_dir != "" and not os.path.isabs(masks_dir):
         masks_dir = os.path.join("../", masks_dir)
 
     ## Now we can train each chunks using the scaffold previously created
@@ -179,7 +180,8 @@ if __name__ == '__main__':
                     )
                 except subprocess.CalledProcessError as e:
                     print(f"Error executing train_single: {e}")
-                    sys.exit(1)
+                    if not args.keep_running:
+                        sys.exit(1)
 
                 # Generate a hierarchy within each chunks
             print(f"Generating hierarchy for chunk {chunk_name}")
@@ -195,7 +197,8 @@ if __name__ == '__main__':
                 )
             except subprocess.CalledProcessError as e:
                 print(f"Error executing hierarchy_creator: {e}")
-                sys.exit(1)
+                if not args.keep_running:
+                    sys.exit(1)
 
             # Post optimization on each chunks
             print(f"post optimizing chunk {chunk_name}")
@@ -207,8 +210,9 @@ if __name__ == '__main__':
                     shell=True, check=True
                 )
             except subprocess.CalledProcessError as e:
-                print(f"Error executing train_coarse: {e}")
-                sys.exit(1)
+                print(f"Error executing train_post: {e}")
+                if not args.keep_running:
+                    sys.exit(1) # TODO: log where it fails and don't add it to the consolidation and add a warning at the end
 
     if args.use_slurm:
         # Check every 10 sec all the jobs status
