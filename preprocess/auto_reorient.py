@@ -128,8 +128,8 @@ if __name__ == '__main__':
     right = candidates[i] - candidates[j]
     right /= np.linalg.norm(right)
     
-    up = torch.from_numpy(up).double()
-    right = torch.from_numpy(right).double()
+    up = torch.tensor(up, dtype=torch.float64)
+    right = torch.tensor(right, dtype=torch.float64)
 
     forward = torch.cross(up, right)
     forward /= torch.norm(forward, p=2)

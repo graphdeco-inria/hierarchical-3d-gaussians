@@ -33,11 +33,11 @@ def direct_collate(x):
 def render_set(args, scene, pipe, out_dir, tau, eval):
     render_path = out_dir
 
-    render_indices = torch.zeros(scene.gaussians._xyz.size(0)).int().cuda()
-    parent_indices = torch.zeros(scene.gaussians._xyz.size(0)).int().cuda()
-    nodes_for_render_indices = torch.zeros(scene.gaussians._xyz.size(0)).int().cuda()
-    interpolation_weights = torch.zeros(scene.gaussians._xyz.size(0)).float().cuda()
-    num_siblings = torch.zeros(scene.gaussians._xyz.size(0)).int().cuda()
+    render_indices = torch.zeros(scene.gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    parent_indices = torch.zeros(scene.gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    nodes_for_render_indices = torch.zeros(scene.gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    interpolation_weights = torch.zeros(scene.gaussians._xyz.size(0), dtype=torch.float, device="cuda")
+    num_siblings = torch.zeros(scene.gaussians._xyz.size(0), dtype=torch.int, device="cuda")
 
     psnr_test = 0.0
     ssims = 0.0

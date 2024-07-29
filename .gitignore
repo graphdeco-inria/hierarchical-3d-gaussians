@@ -1,6 +1,7 @@
-*.pyc
-.vscode
+.*
+__*
 output
 build
+*.egg-info
 tensorboard_3d
 screenshots

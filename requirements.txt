@@ -3,10 +3,10 @@ tqdm
 joblib
 exif
 scikit-learn
-timm==0.4.5
-opencv-python==4.9.0.80
+timm
+opencv-python
 gradio_imageslider
-gradio==4.29.0
+gradio
 matplotlib
 submodules/hierarchy-rasterizer
 submodules/simple-knn

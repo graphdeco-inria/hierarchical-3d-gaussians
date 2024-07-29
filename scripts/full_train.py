@@ -55,7 +55,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--output_dir', default="")
     parser.add_argument('--use_slurm', action="store_true", default=False)
-    parser.add_argument('--skip_if_exists', action="store_true", default=False, help="Skip training a chunk if it already has a hierarchy")
+    parser.add_argument('--skip_if_exists', action="store_true", default=True, help="Skip training a chunk if it already has a hierarchy")
     parser.add_argument('--keep_running', action="store_true", default=False, help="Keep running even if a chunk processing fails")
     args = parser.parse_args()
     print(args.extra_training_args)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
             ])
             if masks_dir != "":
                 train_coarse_args += " --alpha_masks " + masks_dir
-            if args.extra_training_args != "": 
+            if args.extra_training_args != "":
                 train_coarse_args += " " + args.extra_training_args
 
             try:
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         source_chunk = os.path.join(chunks_dir, chunk_name)
         trained_chunk = os.path.join(output_dir, "trained_chunks", chunk_name)
 
-        if args.skip_if_exists and os.path.exists(os.path.join(trained_chunk, "hierarchy.hier_opt")):
+        if args.skip_if_exists and os.path.exists(os.path.join(trained_chunk, "hierarchy.hier")):
             print(f"Skipping {chunk_name}")
         else:
             ## Training can be done in parallel using slurm.
@@ -200,11 +200,14 @@ if __name__ == '__main__':
                 if not args.keep_running:
                     sys.exit(1)
 
+        if args.skip_if_exists and os.path.exists(os.path.join(trained_chunk, "hierarchy.hier_opt")):
+            print(f"Skipping {chunk_name}")
+        else:
             # Post optimization on each chunks
             print(f"post optimizing chunk {chunk_name}")
             try:
                 subprocess.run(
-                    post_opt_chunk_args + " -s "+ source_chunk + 
+                    post_opt_chunk_args + " -s "+ source_chunk +
                     " --model_path " + trained_chunk +
                     " --hierarchy " + os.path.join(trained_chunk, "hierarchy.hier"),
                     shell=True, check=True

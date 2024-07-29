@@ -220,7 +220,7 @@ def render_post(
             if pc.skybox_points == 0:
                 skybox_inds = torch.Tensor([]).long()
             else:
-                skybox_inds = torch.range(pc._xyz.size(0) - pc.skybox_points, pc._xyz.size(0)-1, device="cuda").long()
+                skybox_inds = torch.arange(pc._xyz.size(0) - pc.skybox_points, pc._xyz.size(0), dtype=torch.long, device="cuda")
 
             means3D = torch.cat((means3D_base, means3D[skybox_inds])).contiguous()  
             shs = torch.cat((shs_base, shs[skybox_inds])).contiguous() 
