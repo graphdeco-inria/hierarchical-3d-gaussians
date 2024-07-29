@@ -56,11 +56,11 @@ def training(dataset, opt, pipe, saving_iterations, checkpoint_iterations, check
 
     limit = 0.001
 
-    render_indices = torch.zeros(gaussians._xyz.size(0)).int().cuda()
-    parent_indices = torch.zeros(gaussians._xyz.size(0)).int().cuda()
-    nodes_for_render_indices = torch.zeros(gaussians._xyz.size(0)).int().cuda()
-    interpolation_weights = torch.zeros(gaussians._xyz.size(0)).float().cuda()
-    num_siblings = torch.zeros(gaussians._xyz.size(0)).int().cuda()
+    render_indices = torch.zeros(gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    parent_indices = torch.zeros(gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    nodes_for_render_indices = torch.zeros(gaussians._xyz.size(0), dtype=torch.int, device="cuda")
+    interpolation_weights = torch.zeros(gaussians._xyz.size(0), dtype=torch.float, device="cuda")
+    num_siblings = torch.zeros(gaussians._xyz.size(0), dtype=torch.int, device="cuda")
     to_render = 0
 
     limmax = 0.1
