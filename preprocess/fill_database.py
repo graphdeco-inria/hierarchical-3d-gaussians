@@ -1,6 +1,6 @@
 import argparse
 import database
-from read_write_model import read_model
+from read_write_model import read_model, CAMERA_MODEL_NAMES
 import os
 
 if __name__ == '__main__':
@@ -18,8 +18,7 @@ if __name__ == '__main__':
 
     for key in cam_intrinsics:
         cam = cam_intrinsics[key]
-        ## 1 pinhole, 5 OPENCV_FISHEYE, 3 ??, 4 OPENCV
-        db.add_camera(1, cam.width, cam.height, cam.params, camera_id=key)
+        db.add_camera(CAMERA_MODEL_NAMES[cam.model].model_id, cam.width, cam.height, cam.params, camera_id=key)
 
     for key in images_metas:
         image_meta = images_metas[key]

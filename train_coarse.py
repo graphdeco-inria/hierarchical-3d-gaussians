@@ -95,9 +95,9 @@ def training(dataset, opt, pipe, saving_iterations, checkpoint_iterations, check
                 image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
 
                 # Loss
-                gt_image = (viewpoint_cam.original_image.cuda().float() / 255.0)
+                gt_image = viewpoint_cam.original_image.cuda().float()
                 if viewpoint_cam.alpha_mask is not None:
-                    alpha_mask = (viewpoint_cam.alpha_mask.cuda().float() / 255.0)
+                    alpha_mask = viewpoint_cam.alpha_mask.cuda().float()
                     Ll1 = l1_loss(image * alpha_mask, gt_image) 
                     loss = (1.0 - opt.lambda_dssim) * Ll1 + opt.lambda_dssim * (1.0 - ssim(image * alpha_mask, gt_image))
                 else:
