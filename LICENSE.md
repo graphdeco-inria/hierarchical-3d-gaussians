@@ -1,7 +1,10 @@
+The code for Hierarchical 3D Gaussians is an enhancement of the original 3DGS codebase; the license of the original 3DGS code [License3DGS](https://github.com/graphdeco-inria/gaussian-splatting/blob/main/LICENSE.md) also applies to the parts of the codebase in this repository that build on it. 
+
+
 Hierarchical-3d-Gaussians License  
 ===========================  
 
-**Inria** and **the Max Planck Institut for Informatik (MPII)** hold all the ownership rights on the *Software* named **hierarchical-3d-gaussians**.  
+**Inria** holds all the ownership rights on the *Software* named **hierarchical-3d-gaussians**.  
 The *Software* is in the process of being registered with the Agence pour la Protection des  
 Programmes (APP).  
 
