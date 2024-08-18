@@ -85,8 +85,7 @@ if __name__ == '__main__':
     image_files_organised = find_images_names(args.image_path)
 
     cam_folder_list = []
-    if(len(image_files_organised) > 1):
-        cam_folder_list = os.listdir(f"{args.image_path}")
+    cam_folder_list = os.listdir(f"{args.image_path}")
 
 
     matches_str = []
