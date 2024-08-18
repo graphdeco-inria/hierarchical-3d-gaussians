@@ -75,7 +75,9 @@ if __name__ == '__main__':
         print(f"creating output dir: {output_dir}")
         os.makedirs(os.path.join(output_dir, "scaffold"))
         os.makedirs(os.path.join(output_dir, "trained_chunks"))
-  
+
+    slurm_args = ["sbatch"]
+
     ## First step is coarse optimization to generate a scaffold that will be used later.
     if args.skip_if_exists and os.path.exists(os.path.join(output_dir, "scaffold/point_cloud/iteration_30000/point_cloud.ply")):
         print("Skipping coarse")
@@ -84,9 +86,6 @@ if __name__ == '__main__':
             if args.args.extra_training_args != "":
                 print("\nThe script does not support passing extra_training_args to slurm!!\n")
             submitted_jobs_ids = []
-            slurm_args = [
-                "sbatch", 
-            ]
 
             coarse_train = submit_job(slurm_args + [
                 f"--error={output_dir}/scaffold/log.err", f"--output={output_dir}/scaffold/log.out",
