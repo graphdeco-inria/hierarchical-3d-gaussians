@@ -517,10 +517,10 @@ Now we will generate a hierarchy in each chunk:
 Now we will consolidate and merge all the chunk hierarchies:
     ```
     # Linux:
-    submodules/gaussianhierarchy/build/GaussianHierarchyMerger [path to output/trained_chunks] "0" [path to chunk colmap] [list of all the chunk names] 
+    submodules/gaussianhierarchy/build/GaussianHierarchyMerger [path to output/trained_chunks] "0" [path to chunk colmap] [path to output merged.hier] [list of all the chunk names] 
     
     # Windows:
-    submodules/gaussianhierarchy/build/Release/GaussianHierarchyMerger.exe [path to output/trained_chunks] "0" [path to chunk colmap] [list of all the chunk names] 
+    submodules/gaussianhierarchy/build/Release/GaussianHierarchyMerger.exe [path to output/trained_chunks] "0" [path to chunk colmap] [path to output merged.hier] [list of all the chunk names] 
     ```
 
 ## Slurm parameters
