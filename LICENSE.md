@@ -18,7 +18,7 @@ the *Software*.
 *Licensee* means any person or entity that uses the *Software* and distributes  
 its *Work*.  
 
-*Licensor* means the owners of the *Software*, i.e Inria and MPII  
+*Licensor* means the owners of the *Software*, i.e Inria and TUW  
 
 *Software* means the original work of authorship made available under this  
 License ie hierarchical-3d-gaussians.  
