@@ -78,7 +78,7 @@ if __name__ == '__main__':
         colmap_exe, "feature_extractor",
         "--database_path", f"{args.project_dir}/camera_calibration/unrectified/database.db",
         "--image_path", f"{args.images_dir}",
-        "--ImageReader.single_camera_per_folder", "1",
+        "--ImageReader.single_camera", "1",
         "--ImageReader.default_focal_length_factor", "0.5",
         "--ImageReader.camera_model", "OPENCV",
         ]
