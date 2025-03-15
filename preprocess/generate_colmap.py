@@ -46,11 +46,8 @@ def setup_dirs(project_dir):
         os.makedirs(os.path.join(project_dir, "camera_calibration/rectified"))
 
     if not os.path.exists(os.path.join(project_dir, "camera_calibration/unrectified")):
-        os.makedirs(os.path.join(project_dir, "camera_calibration/unrectified"))
-        os.makedirs(os.path.join(project_dir, "camera_calibration/unrectified", "sparse"))
+        os.makedirs(os.path.join(project_dir, "camera_calibration/unrectified/sparse"))
 
-    if not os.path.exists(os.path.join(project_dir, "camera_calibration/unrectified", "sparse")):
-        os.makedirs(os.path.join(project_dir, "camera_calibration/unrectified", "sparse"))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
