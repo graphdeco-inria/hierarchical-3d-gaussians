@@ -281,7 +281,7 @@ SIBR_viewers/install/bin/SIBR_gaussianHierarchyViewer_app --path ${DATASET_DIR}/
 
     ```
     cd project/unrectified
-    colmap feature_extractor --database_path database.db --image_path <path to images> --ImageReader.single_camera_per_folder 1 --ImageReader.default_focal_length_factor 0.5 --ImageReader.camera_model OPENCV
+    colmap feature_extractor --database_path database.db --image_path <path to images> --ImageReader.single_camera 1 --ImageReader.default_focal_length_factor 0.5 --ImageReader.camera_model OPENCV
     ```
     [**Command Line Arguments**](https://colmap.github.io/cli)
 
