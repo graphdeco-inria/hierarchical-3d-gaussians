@@ -83,7 +83,7 @@ if __name__ == '__main__':
         print("Skipping coarse")
     else:
         if args.use_slurm:
-            if args.args.extra_training_args != "":
+            if args.extra_training_args != "":
                 print("\nThe script does not support passing extra_training_args to slurm!!\n")
             submitted_jobs_ids = []
 
