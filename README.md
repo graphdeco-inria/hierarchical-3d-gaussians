@@ -539,7 +539,7 @@ The beginning of each `.slurm` script must have the following parameters:
 Note that the slurm scripts have not been thouroughly tested.
 
 # Evaluations
-We use a test.txt file that is read by the dataloader and splits into train/test sets when `--eval` is passed to the training scripts. This file should be present in `sprase/0/` for each chunk and for the aligned "global colmap" (if applicable).
+We use a test.txt file that is read by the dataloader and splits into train/test sets when `--eval` is passed to the training scripts. This file should be present in `sparse/0/` for each chunk and for the aligned "global colmap" (if applicable).
 
 ### Single chunk
 The single chunks we used for evaluation: 
