@@ -79,7 +79,7 @@ if __name__ == '__main__':
     slurm_args = ["sbatch"]
 
     ## First step is coarse optimization to generate a scaffold that will be used later.
-    if args.skip_if_exists and os.path.exists(os.path.join(output_dir, "scaffold/point_cloud/iteration_30000/point_cloud.ply")):
+    if args.skip_if_exists and (os.path.exists(os.path.join(output_dir, "scaffold/point_cloud/iteration_30000/point_cloud.ply")) or os.path.exists(os.path.join(output_dir, "scaffold/point_cloud/iteration_30000/point_cloud.bin"))):
         print("Skipping coarse")
     else:
         if args.use_slurm:

@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     if not os.path.isdir(args.output_path):
         os.makedirs(args.output_path)
-    write_model(cameras, images_metas_out, points3d_out, args.output_path, f".{args.model_type}")
+    write_model(cameras, images_metas_out, points3d_out, args.output_path, ".bin")
 
     global_end = time.time()
 

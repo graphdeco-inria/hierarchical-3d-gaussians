@@ -49,6 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_slurm', action="store_true", default=False)
     parser.add_argument('--skip_bundle_adjustment', action="store_true", default=False)
     parser.add_argument('--n_jobs', type=int, default=8, help="Run per chunk COLMAP in parallel on the same machine. Does not handle multi GPU systems. --use_slurm overrides this.")
+    parser.add_argument('--model_type', default="bin")
     args = parser.parse_args()
     
     images_dir, colmap_dir, chunks_dir = setup_dirs(
@@ -73,6 +74,7 @@ if __name__ == '__main__':
             "--base_dir", os.path.join(colmap_dir, "sparse", "0"),
             "--images_dir", f"{images_dir}",
             "--output_path", f"{chunks_dir}/raw_chunks",
+            "--model_type", args.model_type,
         ]
     try:
         subprocess.run(make_chunk_args, check=True)

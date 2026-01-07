@@ -77,6 +77,7 @@ if __name__ == '__main__':
         "--database_path", f"{bundle_adj_chunk}/database.db",
         "--image_path", f"{bundle_adj_chunk}/images",
         "--ImageReader.existing_camera_id", "1",
+        "--SiftExtraction.use_gpu", "0",
         ]
     
     try:
@@ -89,7 +90,8 @@ if __name__ == '__main__':
     colmap_matches_importer_args = [
         colmap_exe, "matches_importer",
         "--database_path", f"{bundle_adj_chunk}/database.db",
-        "--match_list_path", f"{bundle_adj_chunk}/matching_{matching_nb}.txt"
+        "--match_list_path", f"{bundle_adj_chunk}/matching_{matching_nb}.txt",
+        "--SiftMatching.use_gpu", "0",
         ]
     try:
         subprocess.run(colmap_matches_importer_args, check=True)

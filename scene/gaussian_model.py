@@ -23,6 +23,7 @@ from utils.graphics_utils import BasicPointCloud
 from utils.general_utils import strip_symmetric, build_scaling_rotation
 from gaussian_hierarchy._C import load_hierarchy, write_hierarchy
 from scene.OurAdam import Adam
+import struct
 
 class GaussianModel:
 
@@ -206,13 +207,17 @@ class GaussianModel:
 
         self.scaffold_points = None
         if scaffold_file != "": 
-            scaffold_xyz, features_dc_scaffold, features_extra_scaffold, opacities_scaffold, scales_scaffold, rots_scaffold = self.load_ply_file(scaffold_file + "/point_cloud.ply", 1)
-            scaffold_xyz = torch.from_numpy(scaffold_xyz).float()
-            features_dc_scaffold = torch.from_numpy(features_dc_scaffold).permute(0, 2, 1).float()
-            features_extra_scaffold = torch.from_numpy(features_extra_scaffold).permute(0, 2, 1).float()
-            opacities_scaffold = torch.from_numpy(opacities_scaffold).float()
-            scales_scaffold = torch.from_numpy(scales_scaffold).float()
-            rots_scaffold = torch.from_numpy(rots_scaffold).float()
+            if os.path.exists(scaffold_file + "/point_cloud.ply"):
+                scaffold_xyz, features_dc_scaffold, features_extra_scaffold, opacities_scaffold, scales_scaffold, rots_scaffold = self.load_ply_file(scaffold_file + "/point_cloud.ply", 1)
+                scaffold_xyz = torch.from_numpy(scaffold_xyz).float()
+                features_dc_scaffold = torch.from_numpy(features_dc_scaffold).permute(0, 2, 1).float()
+                features_extra_scaffold = torch.from_numpy(features_extra_scaffold).permute(0, 2, 1).float()
+                opacities_scaffold = torch.from_numpy(opacities_scaffold).float()
+                scales_scaffold = torch.from_numpy(scales_scaffold).float()
+                rots_scaffold = torch.from_numpy(rots_scaffold).float()
+            else:
+                scaffold_xyz, features_dc_scaffold, features_extra_scaffold, opacities_scaffold, scales_scaffold, rots_scaffold = self.load_pt(scaffold_file)
+
 
             with open(scaffold_file + "/pc_info.txt") as f:
                 skybox_points = int(f.readline())
@@ -452,6 +457,17 @@ class GaussianModel:
             l.append('rot_{}'.format(i))
         return l
 
+
+    def load_pt(self, path):
+        xyz = torch.load(os.path.join(path, "done_xyz.pt")).detach().cpu()
+        features_dc = torch.load(os.path.join(path, "done_dc.pt")).detach().cpu()
+        features_rest = torch.load( os.path.join(path, "done_rest.pt")).detach().cpu()
+        opacity = torch.load(os.path.join(path, "done_opacity.pt")).detach().cpu()
+        scaling = torch.load(os.path.join(path, "done_scaling.pt")).detach().cpu()
+        rotation = torch.load(os.path.join(path, "done_rotation.pt")).detach().cpu()
+
+        return xyz, features_dc, features_rest, opacity, scaling, rotation
+
     def save_pt(self, path):
         mkdir_p(path)
 
@@ -462,19 +478,7 @@ class GaussianModel:
         torch.save(self._scaling, os.path.join(path, "done_scaling.pt"))
         torch.save(self._rotation, os.path.join(path, "done_rotation.pt"))
 
-        import struct
-        def load_pt(path):
-            xyz = torch.load(os.path.join(path, "done_xyz.pt")).detach().cpu()
-            features_dc = torch.load(os.path.join(path, "done_dc.pt")).detach().cpu()
-            features_rest = torch.load( os.path.join(path, "done_rest.pt")).detach().cpu()
-            opacity = torch.load(os.path.join(path, "done_opacity.pt")).detach().cpu()
-            scaling = torch.load(os.path.join(path, "done_scaling.pt")).detach().cpu()
-            rotation = torch.load(os.path.join(path, "done_rotation.pt")).detach().cpu()
-
-            return xyz, features_dc, features_rest, opacity, scaling, rotation
-
-
-        xyz, features_dc, features_rest, opacity, scaling, rotation = load_pt(path)
+        xyz, features_dc, features_rest, opacity, scaling, rotation = self.load_pt(path)
 
         my_int = xyz.size(0)
         with open(os.path.join(path, "point_cloud.bin"), 'wb') as f:
